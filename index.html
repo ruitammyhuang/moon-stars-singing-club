@@ -3,24 +3,97 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Moon Stars Singing Club - Test</title>
+  <title>Moon Stars Singing Club – Auth Test</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      background: #f6f6f6;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 420px;
+      margin-bottom: 16px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 16px;
+    }
+    button {
+      cursor: pointer;
+    }
+    .success {
+      color: #0a7a2f;
+      font-weight: 600;
+    }
+    .error {
+      color: #b00020;
+      font-weight: 600;
+    }
+    pre {
+      background: #111;
+      color: #eee;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
 </head>
 <body>
-  <h2>Supabase Sanity Check</h2>
-  <p>Open DevTools Console to see results.</p>
 
-  <div style="display:grid; gap:10px; max-width:420px;">
+  <h2>Supabase Auth Sanity Check</h2>
+
+  <div class="card">
+    <h3>Operator Login</h3>
     <input id="email" placeholder="Operator email" />
-    <input id="password" type="password" placeholder="Operator password" />
+    <input id="password" type="password" placeholder="Password" />
     <button id="loginBtn">Login</button>
+    <div id="loginStatus"></div>
+  </div>
+
+  <div class="card">
+    <h3>Post-login Tests</h3>
     <button id="eventsBtn">Fetch Active Events</button>
     <input id="qr" placeholder="QR code value (qr_code_url)" />
     <button id="rpcBtn">RPC Check-in</button>
   </div>
 
-  <pre id="out" style="white-space:pre-wrap; margin-top:16px;"></pre>
+  <div class="card">
+    <h3>Debug Output</h3>
+    <pre id="out">(results will appear here)</pre>
+  </div>
 
   <script src="app.js"></script>
+
+  <script>
+    // Simple UI feedback hook (no Supabase logic here)
+    const loginStatus = document.getElementById("loginStatus");
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      loginStatus.textContent = "Attempting login…";
+      loginStatus.className = "";
+    });
+
+    // Listen for auth state changes and show status
+    if (window.supabaseClientForStatusHook) {
+      window.supabaseClientForStatusHook.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_IN") {
+          loginStatus.textContent = "Login successful ✔";
+          loginStatus.className = "success";
+        }
+        if (event === "SIGNED_OUT") {
+          loginStatus.textContent = "Logged out";
+          loginStatus.className = "";
+        }
+      });
+    }
+  </script>
+
 </body>
 </html>
