@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Moon Stars Singing Club - Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h2>Supabase Sanity Check</h2>
+  <p>Open DevTools Console to see results.</p>
+
+  <div style="display:grid; gap:10px; max-width:420px;">
+    <input id="email" placeholder="Operator email" />
+    <input id="password" type="password" placeholder="Operator password" />
+    <button id="loginBtn">Login</button>
+    <button id="eventsBtn">Fetch Active Events</button>
+    <input id="qr" placeholder="QR code value (qr_code_url)" />
+    <button id="rpcBtn">RPC Check-in</button>
+  </div>
+
+  <pre id="out" style="white-space:pre-wrap; margin-top:16px;"></pre>
+
+  <script src="app.js"></script>
+</body>
+</html>
