@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Moon Stars Singing Club | Check-in</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body data-page="checkin">
+  <header class="topbar">
+    <div class="brand">
+      <img src="images/moonstarslogo.png" alt="Moon Stars Singing Club" class="logo" />
+      <div class="brand-text">
+        <div class="brand-title">Moon Stars Singing Club</div>
+        <div class="brand-subtitle">Check-in</div>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <a class="btn ghost" href="index.html">Dashboard</a>
+      <span id="authPill" class="pill neutral">Not signed in</span>
+      <button id="logoutBtn" class="btn ghost" type="button" style="display:none;">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="loginCard" class="card" style="display:none;">
+      <h2>Operator Login</h2>
+      <p class="muted">Please sign in to perform check-ins.</p>
+
+      <div class="form">
+        <label>Email</label>
+        <input id="email" autocomplete="username" placeholder="operator@email.com" />
+
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password" />
+
+        <button id="loginBtn" class="btn primary" type="button">Login</button>
+        <div id="loginStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section id="checkinCard" class="card" style="display:none;">
+      <div class="card-header">
+        <div>
+          <h2>Check-in</h2>
+          <div id="activeEventMeta" class="muted"></div>
+        </div>
+        <div class="card-actions">
+          <button id="clearBtn" class="btn ghost" type="button">Clear</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input id="qrInput" placeholder="Paste QR value (qr_code_url)..." />
+        <button id="lookupBtn" class="btn" type="button">Lookup</button>
+      </div>
+
+      <div id="lookupStatus" class="status"></div>
+
+      <div id="resultArea" style="display:none;">
+        <div class="profile">
+          <div class="profile-main">
+            <div id="pName" class="profile-name">–</div>
+            <div id="pMeta" class="muted"></div>
+            <div id="pBadge" class="pill neutral" style="margin-top:10px;">–</div>
+          </div>
+          <div class="profile-actions">
+            <button id="confirmBtn" class="btn primary" type="button">Confirm check-in</button>
+          </div>
+        </div>
+
+        <div id="inviteWrap" class="invite-wrap" style="display:none;">
+          <img id="inviteImg" alt="Invitation" class="invite-img" />
+        </div>
+      </div>
+    </section>
+
+    <section id="errorCard" class="card" style="display:none;">
+      <h2>Something needs attention</h2>
+      <div id="fatalError" class="status error"></div>
+    </section>
+  </main>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
