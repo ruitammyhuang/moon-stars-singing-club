@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stars Bay Singing Club 2026 Spring Festival Gala</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body data-page="dashboard">
+  <header class="topbar">
+    <div class="brand">
+      <img src="images/moonstarslogo.png" alt="Moon Stars Singing Club" class="logo" />
+      <div class="brand-text">
+        <div class="brand-title">Stars Bay Singing Club</div>
+        <div class="brand-subtitle">2026 Spring Festival Gala Check-in</div>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <span id="authPill" class="pill neutral">Not signed in</span>
+      <button id="logoutBtn" class="btn ghost" type="button" style="display:none;">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="loginCard" class="card" style="display:none;">
+      <h2>Operator Login</h2>
+      <p class="muted">Sign in to access the dashboard and check-in tools.</p>
+
+      <div class="form">
+        <label>Email</label>
+        <input id="email" autocomplete="username" placeholder="operator@email.com" />
+
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password" />
+
+        <button id="loginBtn" class="btn primary" type="button">Login</button>
+        <div id="loginStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section id="dashboardCard" class="card" style="display:none;">
+      <div class="card-header">
+        <div>
+          <h2 id="eventTitle">Dashboard</h2>
+          <div id="eventMeta" class="muted"></div>
+        </div>
+
+        <div class="card-actions">
+          <a class="btn ghost" href="checkin.html">Open Check-in Page</a>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Checked in</div>
+          <div id="statChecked" class="stat-value">–</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Total expected</div>
+          <div id="statTotal" class="stat-value">–</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Not checked in</div>
+          <div id="statRemaining" class="stat-value">–</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input id="search" placeholder="Search by name..." />
+        <button id="refreshBtn" class="btn" type="button">Refresh</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Name</th>
+              <th>Checked-in time</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="hint muted">
+        Tip: click “Check in” to jump to the check-in page for that participant.
+      </div>
+    </section>
+
+    <section id="errorCard" class="card" style="display:none;">
+      <h2>Something needs attention</h2>
+      <div id="fatalError" class="status error"></div>
+    </section>
+  </main>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
