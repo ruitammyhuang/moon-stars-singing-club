@@ -51,3 +51,6 @@ document.getElementById("rpcBtn").addEventListener("click", async () => {
 
   log({ step: "rpc check_in_participant", ok: true, updated_row: data });
 });
+
+// D) expose client for login status UI
+window.supabaseClientForStatusHook = supabase;
