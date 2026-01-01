@@ -375,10 +375,11 @@ async function loadAdminAdd() {
   const { data: events, error: eErr } = await supabaseClient
     .from("events")
     .select("id, title, start_date, start_time, is_active, created_at")
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
 
   if (eErr) return fatal(eErr.message);
-  if (!events || events.length === 0) return fatal("No events found.");
+  if (!events || events.length === 0) return fatal("No events found. Set one event as active.");
 
   const eventSelect = $("eventSelect");
   eventSelect.innerHTML = events.map(ev => {
