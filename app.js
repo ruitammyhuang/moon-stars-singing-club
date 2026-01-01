@@ -182,54 +182,37 @@ async function loadCheckin() {
   }
 
   activeEventId = ev.id;
-  $("activeEventMeta").textContent = [ev.title, ev.location_name, fmtDateTime(ev.start_date, ev.start_time)].filter(Boolean).join(" • ");
+  if ($("activeEventMeta")) {
+    $("activeEventMeta").textContent = [ev.title, ev.location_name, fmtDateTime(ev.start_date, ev.start_time)]
+      .filter(Boolean).join(" • ");
+  }
 
   const params = new URLSearchParams(location.search);
-  const initialToken = params.get("t") || "";   // IMPORTANT: token param is "t"
-  if ($("qrInput")) $("qrInput").value = initialToken;
-
-  $("lookupBtn").onclick = () => doLookupAndRender();
-  $("clearBtn").onclick = () => {
-    $("qrInput").value = "";
-    $("lookupStatus").textContent = "";
-    $("lookupStatus").className = "status";
-    show("inviteWrap", false);
-    show("resultArea", false);
-    currentToken = null;
-    currentRow = null;
-  };
-
-  if (initialToken) await doLookupAndRender();
-  show("checkinCard", true);
-}
-
-async function doLookupAndRender() {
-  const token = ($("qrInput")?.value || "").trim();
-  const status = $("lookupStatus");
+  const token = (params.get("t") || "").trim();
 
   if (!token) {
+    const status = $("lookupStatus");
     if (status) {
-      status.textContent = "Please paste a QR token first.";
+      status.textContent = "No QR token found in the URL. Please scan a participant QR code.";
       status.className = "status error";
     }
     show("resultArea", false);
+    show("checkinCard", true);
     return;
   }
+
+  await doLookupAndRender(token);
+  show("checkinCard", true);
+}
+
+async function doLookupAndRender(token) {
+  const status = $("lookupStatus");
 
   if (status) {
     status.textContent = "Looking up participant...";
     status.className = "status";
   }
 
-  if (!activeEventId) {
-    if (status) {
-      status.textContent = "No active event loaded.";
-      status.className = "status error";
-    }
-    return;
-  }
-
-  // Lookup by active event + token
   const { data, error } = await supabaseClient
     .from("event_participants")
     .select("participant_name, participant_type, participant_affiliation, invite_image_url, checked_in, checked_in_at, qr_token")
@@ -266,12 +249,14 @@ async function doLookupAndRender() {
 
   if (currentRow.checked_in) {
     badge.textContent = `Checked in${currentRow.checked_in_at ? " • " + fmtLocal(currentRow.checked_in_at) : ""}`;
-    badge.className = "pill good";
+    badge.className = "pill good profile-badge";
     confirmBtn.disabled = true;
+    confirmBtn.textContent = "Already checked in";
   } else {
     badge.textContent = "Not checked in";
-    badge.className = "pill neutral";
+    badge.className = "pill neutral profile-badge";
     confirmBtn.disabled = false;
+    confirmBtn.textContent = "Confirm check-in";
   }
 
   if (currentRow.invite_image_url) {
@@ -281,13 +266,13 @@ async function doLookupAndRender() {
     show("inviteWrap", false);
   }
 
-  // Ensure we don’t stack listeners
+  // Confirm should actually check in, then redirect to dashboard
   confirmBtn.onclick = async () => {
     await doConfirmCheckin();
   };
 
   if (status) {
-    status.textContent = "Participant found.";
+    status.textContent = "Participant loaded.";
     status.className = "status success";
   }
   show("resultArea", true);
@@ -305,7 +290,6 @@ async function doConfirmCheckin() {
     status.className = "status";
   }
 
-  // RPC expects uuid (string will be cast)
   const { error } = await supabaseClient.rpc("check_in_participant", {
     p_qr_token: currentToken
   });
@@ -319,13 +303,10 @@ async function doConfirmCheckin() {
     return;
   }
 
-  if (status) {
-    status.textContent = "Check-in confirmed.";
-    status.className = "status success";
-  }
-
-  await doLookupAndRender();
+  // Success: go to dashboard to show updated counts
+  window.location.href = "index.html";
 }
+
 
 // ===== Fatal / Escape =====
 function fatal(msg) {
