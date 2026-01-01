@@ -308,6 +308,157 @@ async function doConfirmCheckin() {
 }
 
 
+// ===== Page: Admin Add Participants =====
+let allParticipants = [];
+let selected = new Set();
+
+function setAdminStatus(msg, kind = "") {
+  const el = $("adminStatus");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.className = "status" + (kind ? " " + kind : "");
+}
+
+function updateSelCount() {
+  const el = $("selCount");
+  if (el) el.textContent = String(selected.size);
+}
+
+function participantRowHtml(p) {
+  const id = p.id;
+  const checked = selected.has(id) ? "checked" : "";
+  return `
+    <tr>
+      <td><input type="checkbox" data-pid="${escapeHtml(id)}" ${checked} /></td>
+      <td>${escapeHtml(p.full_name || "")}</td>
+      <td>${escapeHtml(p.participant_type || "")}</td>
+      <td>${escapeHtml(p.participant_affiliation || "")}</td>
+    </tr>
+  `;
+}
+
+function renderParticipants(filterText) {
+  const tbody = $("pTbody");
+  if (!tbody) return;
+
+  const f = (filterText || "").toLowerCase().trim();
+  const list = allParticipants.filter(p => {
+    const name = (p.full_name || "").toLowerCase();
+    return !f || name.includes(f);
+  });
+
+  tbody.innerHTML = list.map(participantRowHtml).join("");
+
+  // attach checkbox listeners
+  tbody.querySelectorAll('input[type="checkbox"][data-pid]').forEach(cb => {
+    cb.addEventListener("change", (e) => {
+      const pid = e.target.getAttribute("data-pid");
+      if (e.target.checked) selected.add(pid);
+      else selected.delete(pid);
+      updateSelCount();
+    });
+  });
+
+  updateSelCount();
+}
+
+async function loadAdminAdd() {
+  show("adminCard", false);
+  show("errorCard", false);
+
+  const sessionOk = await ensureAuthUI();
+  if (!sessionOk) return;
+
+  setAdminStatus("Loading events and participants...");
+
+  // Load events (you can change to only active if you want)
+  const { data: events, error: eErr } = await supabaseClient
+    .from("events")
+    .select("id, title, start_date, start_time, is_active, created_at")
+    .order("created_at", { ascending: false });
+
+  if (eErr) return fatal(eErr.message);
+  if (!events || events.length === 0) return fatal("No events found.");
+
+  const eventSelect = $("eventSelect");
+  eventSelect.innerHTML = events.map(ev => {
+    const label = `${ev.title || "Untitled"}${ev.is_active ? " (active)" : ""}`;
+    return `<option value="${escapeHtml(ev.id)}">${escapeHtml(label)}</option>`;
+  }).join("");
+
+  // Load participants
+  // IMPORTANT: your participants table column names must match these selects:
+  // - id (uuid), full_name, participant_type, participant_affiliation
+  const { data: participants, error: pErr } = await supabaseClient
+    .from("participants")
+    .select("id, full_name, participant_type, participant_affiliation")
+    .eq("is_active", true)
+    .order("full_name", { ascending: true });
+
+  if (pErr) return fatal(pErr.message);
+
+  allParticipants = participants || [];
+  selected = new Set();
+  renderParticipants("");
+
+  $("pSearch").addEventListener("input", (e) => renderParticipants(e.target.value));
+
+  $("selectAllBtn").onclick = () => {
+    const f = ($("pSearch")?.value || "").toLowerCase().trim();
+    const visible = allParticipants.filter(p => {
+      const name = (p.full_name || "").toLowerCase();
+      return !f || name.includes(f);
+    });
+    visible.forEach(p => selected.add(p.id));
+    renderParticipants($("pSearch")?.value || "");
+  };
+
+  $("clearSelBtn").onclick = () => {
+    selected = new Set();
+    renderParticipants($("pSearch")?.value || "");
+  };
+
+  $("addBtn").onclick = async () => {
+    const eventId = eventSelect.value;
+    if (!eventId) return setAdminStatus("Please select an event.", "error");
+    if (selected.size === 0) return setAdminStatus("Select at least one participant.", "error");
+
+    setAdminStatus("Adding selected participants...", "");
+
+    // Build rows for event_participants.
+    // This assumes event_participants has participant_id and event_id not null.
+    // If you also require participant_name/type/affiliation, we can include those too.
+    const rows = Array.from(selected).map(pid => {
+      const p = allParticipants.find(x => x.id === pid);
+      return {
+        event_id: eventId,
+        participant_id: pid,
+        participant_name: p?.full_name || null,
+        participant_type: p?.participant_type || null,
+        participant_affiliation: p?.participant_affiliation || null
+      };
+    });
+
+    // Use upsert to avoid duplicate errors
+    const { error } = await supabaseClient
+      .from("event_participants")
+      .upsert(rows, { onConflict: "event_id,participant_id" });
+
+    if (error) {
+      setAdminStatus("Add failed: " + error.message, "error");
+      return;
+    }
+
+    setAdminStatus(`Added/updated ${rows.length} participants for this event.`, "success");
+  };
+
+  setAdminStatus("Ready.", "success");
+  show("adminCard", true);
+}
+
+
+
+
 // ===== Fatal / Escape =====
 function fatal(msg) {
   show("dashboardCard", false);
@@ -323,6 +474,8 @@ function escapeHtml(s) {
   }[c]));
 }
 
+
+
 // ===== Init =====
 window.addEventListener("load", async () => {
   $("loginBtn")?.addEventListener("click", doLogin);
@@ -331,10 +484,12 @@ window.addEventListener("load", async () => {
   supabaseClient.auth.onAuthStateChange(() => {
     const page = document.body.getAttribute("data-page");
     if (page === "checkin") loadCheckin();
+    else if (page === "admin-add") loadAdminAdd();
     else loadDashboard();
   });
 
   const page = document.body.getAttribute("data-page");
   if (page === "checkin") await loadCheckin();
+  else if (page === "admin-add") await loadAdminAdd();
   else await loadDashboard();
 });
