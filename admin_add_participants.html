@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stars Bay | Add Participants</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body data-page="admin-add">
+  <header class="topbar">
+    <div class="brand">
+      <img src="images/moonstarslogo.png" alt="Moon Stars Singing Club" class="logo" />
+      <div class="brand-text">
+        <div class="brand-title">Stars Bay</div>
+        <div class="brand-subtitle">Add Event Participants</div>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <a class="btn ghost" href="index.html">Dashboard</a>
+      <span id="authPill" class="pill neutral">Not signed in</span>
+      <button id="logoutBtn" class="btn ghost" type="button" style="display:none;">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section id="loginCard" class="card" style="display:none;">
+      <h2>Operator Login</h2>
+      <p class="muted">Sign in to manage event participants.</p>
+
+      <div class="form">
+        <label>Email</label>
+        <input id="email" autocomplete="username" placeholder="operator@email.com" />
+
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password" />
+
+        <button id="loginBtn" class="btn primary" type="button">Login</button>
+        <div id="loginStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section id="adminCard" class="card" style="display:none;">
+      <div class="card-header">
+        <div>
+          <h2>Batch Add Participants</h2>
+          <div class="muted">Select an event, then choose participants to add.</div>
+        </div>
+      </div>
+
+      <div class="toolbar" style="gap:10px; flex-wrap:wrap;">
+        <div style="min-width:260px; flex:1;">
+          <label class="muted" style="display:block; margin-bottom:6px;">Event</label>
+          <select id="eventSelect" class="input" style="width:100%;"></select>
+        </div>
+
+        <div style="min-width:260px; flex:2;">
+          <label class="muted" style="display:block; margin-bottom:6px;">Search participants</label>
+          <input id="pSearch" class="input" placeholder="Type a name..." style="width:100%;" />
+        </div>
+
+        <div style="display:flex; align-items:flex-end; gap:8px;">
+          <button id="selectAllBtn" class="btn" type="button">Select all</button>
+          <button id="clearSelBtn" class="btn ghost" type="button">Clear</button>
+        </div>
+      </div>
+
+      <div id="adminStatus" class="status" style="margin-top:10px;"></div>
+
+      <div class="table-wrap" style="margin-top:12px;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width:44px;"></th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Affiliation</th>
+            </tr>
+          </thead>
+          <tbody id="pTbody"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;">
+        <div class="muted">
+          Selected: <span id="selCount">0</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button id="addBtn" class="btn primary" type="button">Add selected to event</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="errorCard" class="card" style="display:none;">
+      <h2>Something needs attention</h2>
+      <div id="fatalError" class="status error"></div>
+    </section>
+
+  </main>
+
+  <script src="app.js?v=4"></script>
+</body>
+</html>
