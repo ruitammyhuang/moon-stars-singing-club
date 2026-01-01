@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stars Bay Singing Club 2026 Spring Festival Gala</title>
+  <title>Stars Bay Singing Club</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,30 +13,29 @@
     <div class="brand">
       <img src="images/moonstarslogo.png" alt="Moon Stars Singing Club" class="logo" />
       <div class="brand-text">
-        <div class="brand-title">Stars Bay Singing Club</div>
-        <div class="brand-subtitle">2026 Spring Festival Gala Check-in</div>
+        <div class="brand-title">月牙泉/星子湾歌友会</div>
       </div>
     </div>
 
     <div class="topbar-actions">
-      <span id="authPill" class="pill neutral">Not signed in</span>
-      <button id="logoutBtn" class="btn ghost" type="button" style="display:none;">Logout</button>
+      <span id="authPill" class="pill neutral">未登录</span>
+      <button id="logoutBtn" class="btn ghost" type="button" style="display:none;">退出</button>
     </div>
   </header>
 
   <main class="container">
     <section id="loginCard" class="card" style="display:none;">
-      <h2>Operator Login</h2>
-      <p class="muted">Sign in to access the dashboard and check-in tools.</p>
+      <h2>管理员登录</h2>
+      <p class="muted"> 登录进入控制面板。</p>
 
       <div class="form">
-        <label>Email</label>
+        <label>用户邮箱</label>
         <input id="email" autocomplete="username" placeholder="operator@email.com" />
 
-        <label>Password</label>
+        <label>密码</label>
         <input id="password" type="password" autocomplete="current-password" placeholder="Password" />
 
-        <button id="loginBtn" class="btn primary" type="button">Login</button>
+        <button id="loginBtn" class="btn primary" type="button">登录</button>
         <div id="loginStatus" class="status"></div>
       </div>
     </section>
@@ -44,43 +43,40 @@
     <section id="dashboardCard" class="card" style="display:none;">
       <div class="card-header">
         <div>
-          <h2 id="eventTitle">Dashboard</h2>
+          <h2 id="eventTitle">控制面板</h2>
           <div id="eventMeta" class="muted"></div>
         </div>
 
-        <div class="card-actions">
-          <a class="btn ghost" href="checkin.html">Open Check-in Page</a>
-        </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Checked in</div>
+          <div class="stat-label"> 已检票人数 </div>
           <div id="statChecked" class="stat-value">–</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Total expected</div>
+          <div class="stat-label"> 总人数 </div>
           <div id="statTotal" class="stat-value">–</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Not checked in</div>
+          <div class="stat-label"> 未检票人数 </div>
           <div id="statRemaining" class="stat-value">–</div>
         </div>
       </div>
 
       <div class="toolbar">
         <input id="search" placeholder="Search by name..." />
-        <button id="refreshBtn" class="btn" type="button">Refresh</button>
+        <button id="refreshBtn" class="btn" type="button"> 刷新 </button>
       </div>
 
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
-              <th>Status</th>
-              <th>Name</th>
-              <th>Checked-in time</th>
-              <th>Action</th>
+              <th> 状态 </th>
+              <th> 人名 </th>
+              <th> 检票时间 </th>
+              <th> 行为 </th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -88,12 +84,12 @@
       </div>
 
       <div class="hint muted">
-        Tip: click “Check in” to jump to the check-in page for that participant.
+        备注：点击 “Check in” 即可跳转到该参会人员的检票页面。
       </div>
     </section>
 
     <section id="errorCard" class="card" style="display:none;">
-      <h2>Something needs attention</h2>
+      <h2>错误提示</h2>
       <div id="fatalError" class="status error"></div>
     </section>
   </main>
