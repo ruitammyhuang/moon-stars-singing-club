@@ -3,18 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Moon Stars Singing Club | Check-in</title>
+  <title>Stars Bay</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* Compact profile header row */
+    .profile-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .profile-left {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-width: 220px;
+    }
+    .profile-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .profile-meta {
+      font-size: 0.95rem;
+    }
+    .profile-badge {
+      margin-top: 0 !important;
+      white-space: nowrap;
+    }
+  </style>
 </head>
 <body data-page="checkin">
   <header class="topbar">
     <div class="brand">
       <img src="images/moonstarslogo.png" alt="Moon Stars Singing Club" class="logo" />
       <div class="brand-text">
-        <div class="brand-title">Moon Stars Singing Club</div>
-        <div class="brand-subtitle">Check-in</div>
+        <div class="brand-title">Stars Bay</div>
       </div>
     </div>
 
@@ -53,21 +82,19 @@
         </div>
       </div>
 
-      <div class="toolbar">
-        <input id="qrInput" placeholder="Paste QR token (qr_token)..." />
-        <button id="lookupBtn" class="btn" type="button">Lookup</button>
-      </div>
-
       <div id="lookupStatus" class="status"></div>
 
       <div id="resultArea" style="display:none;">
         <div class="profile">
-          <div class="profile-main">
-            <div id="pName" class="profile-name">–</div>
-            <div id="pMeta" class="muted"></div>
-            <div id="pBadge" class="pill neutral" style="margin-top:10px;">–</div>
+          <div class="profile-top">
+            <div class="profile-left">
+              <div id="pName" class="profile-name">–</div>
+              <div id="pMeta" class="muted profile-meta"></div>
+            </div>
+            <div id="pBadge" class="pill neutral profile-badge">–</div>
           </div>
-          <div class="profile-actions">
+
+          <div class="profile-actions" style="margin-top: 12px;">
             <button id="confirmBtn" class="btn primary" type="button">Confirm check-in</button>
           </div>
         </div>
@@ -84,6 +111,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
