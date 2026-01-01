@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -43,30 +43,30 @@
     <div class="brand">
       <img src="images/moonstarslogo.png" alt="Moon Stars Singing Club" class="logo" />
       <div class="brand-text">
-        <div class="brand-title">Stars Bay</div>
+        <div class="brand-title">月牙泉/星子湾歌友会</div>
       </div>
     </div>
 
     <div class="topbar-actions">
-      <a class="btn ghost" href="index.html">Dashboard</a>
-      <span id="authPill" class="pill neutral">Not signed in</span>
-      <button id="logoutBtn" class="btn ghost" type="button" style="display:none;">Logout</button>
+      <a class="btn ghost" href="index.html">  </a>
+      <span id="authPill" class="pill neutral">未登录</span>
+      <button id="logoutBtn" class="btn ghost" type="button" style="display:none;">退出</button>
     </div>
   </header>
 
   <main class="container">
     <section id="loginCard" class="card" style="display:none;">
-      <h2>Operator Login</h2>
-      <p class="muted">Please sign in to perform check-ins.</p>
+      <h2>管理员登录</h2>
+      <p class="muted">请先登录再进行检票。</p>
 
       <div class="form">
-        <label>Email</label>
+        <label>用户邮箱</label>
         <input id="email" autocomplete="username" placeholder="operator@email.com" />
 
-        <label>Password</label>
+        <label>密码</label>
         <input id="password" type="password" autocomplete="current-password" placeholder="Password" />
 
-        <button id="loginBtn" class="btn primary" type="button">Login</button>
+        <button id="loginBtn" class="btn primary" type="button"> 登录 </button>
         <div id="loginStatus" class="status"></div>
       </div>
     </section>
@@ -74,7 +74,7 @@
     <section id="checkinCard" class="card" style="display:none;">
       <div class="card-header">
         <div>
-          <h2>Check-in</h2>
+          <h2> 检票 </h2>
           <div id="activeEventMeta" class="muted"></div>
         </div>
       </div>
@@ -92,7 +92,7 @@
           </div>
 
           <div class="profile-actions" style="margin-top: 12px;">
-            <button id="confirmBtn" class="btn primary" type="button">Confirm check-in</button>
+            <button id="confirmBtn" class="btn primary" type="button"> 确认检票 </button>
           </div>
         </div>
 
@@ -103,7 +103,7 @@
     </section>
 
     <section id="errorCard" class="card" style="display:none;">
-      <h2>Something needs attention</h2>
+      <h2> 错误提示 </h2>
       <div id="fatalError" class="status error"></div>
     </section>
   </main>
