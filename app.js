@@ -332,7 +332,7 @@ function participantRowHtml(p) {
       <td><input type="checkbox" data-pid="${escapeHtml(id)}" ${checked} /></td>
       <td>${escapeHtml(p.full_name || "")}</td>
       <td>${escapeHtml(p.participant_type || "")}</td>
-      <td>${escapeHtml(p.participant_affiliation || "")}</td>
+      <td>${escapeHtml(p.affiliation || "")}</td>
     </tr>
   `;
 }
@@ -392,7 +392,7 @@ async function loadAdminAdd() {
   // - id (uuid), full_name, participant_type, participant_affiliation
   const { data: participants, error: pErr } = await supabaseClient
     .from("participants")
-    .select("id, full_name, participant_type, participant_affiliation")
+    .select("id, full_name, participant_type, affiliation")
     .eq("is_active", true)
     .order("full_name", { ascending: true });
 
@@ -436,7 +436,7 @@ async function loadAdminAdd() {
         participant_id: pid,
         participant_name: p?.full_name || null,
         participant_type: p?.participant_type || null,
-        participant_affiliation: p?.participant_affiliation || null
+        participant_affiliation: p?.affiliation || null
       };
     });
 
