@@ -337,19 +337,31 @@ function participantRowHtml(p) {
   `;
 }
 
-function renderParticipants(filterText) {
+function renderParticipantsWithSource(filterText, sourceList) {
   const tbody = $("pTbody");
   if (!tbody) return;
 
+  const list0 = sourceList || [];
   const f = (filterText || "").toLowerCase().trim();
-  const list = allParticipants.filter(p => {
+
+  const list = list0.filter(p => {
     const name = (p.full_name || "").toLowerCase();
     return !f || name.includes(f);
   });
 
-  tbody.innerHTML = list.map(participantRowHtml).join("");
+  tbody.innerHTML = list.map(p => {
+    const id = p.id;
+    const checked = selected.has(id) ? "checked" : "";
+    return `
+      <tr>
+        <td><input type="checkbox" data-pid="${escapeHtml(id)}" ${checked} /></td>
+        <td>${escapeHtml(p.full_name || "")}</td>
+        <td>${escapeHtml(p.participant_type || "")}</td>
+        <td>${escapeHtml(p.affiliation || "")}</td>
+      </tr>
+    `;
+  }).join("");
 
-  // attach checkbox listeners
   tbody.querySelectorAll('input[type="checkbox"][data-pid]').forEach(cb => {
     cb.addEventListener("change", (e) => {
       const pid = e.target.getAttribute("data-pid");
@@ -371,15 +383,15 @@ async function loadAdminAdd() {
 
   setAdminStatus("Loading events and participants...");
 
-  // Load events (you can change to only active if you want)
+  // Load events 
   const { data: events, error: eErr } = await supabaseClient
     .from("events")
     .select("id, title, start_date, start_time, is_active, created_at")
     .eq("is_active", true)
     .order("created_at", { ascending: false });
-
+  
   if (eErr) return fatal(eErr.message);
-  if (!events || events.length === 0) return fatal("No events found. Set one event as active.");
+  if (!events || events.length === 0) return fatal("No active events found. Set one event is_active = true.");
 
   const eventSelect = $("eventSelect");
   eventSelect.innerHTML = events.map(ev => {
@@ -387,6 +399,60 @@ async function loadAdminAdd() {
     return `<option value="${escapeHtml(ev.id)}">${escapeHtml(label)}</option>`;
   }).join("");
 
+  // Load active participants (use your real column names from the screenshot)
+  const { data: participants, error: pErr } = await supabaseClient
+    .from("participants")
+    .select("id, full_name, participant_type, affiliation, is_active")
+    .eq("is_active", true)
+    .order("full_name", { ascending: true });
+  
+  if (pErr) return fatal(pErr.message);
+  
+  allParticipants = participants || [];
+  selected = new Set();
+
+  // refresh function that filters out already-added participants
+  async function refreshCandidateListForSelectedEvent() {
+    const eventId = $("eventSelect")?.value;
+    if (!eventId) return;
+  
+    setAdminStatus("Loading eligible participants...", "");
+  
+    let existingIds;
+    try {
+      existingIds = await getExistingParticipantIdsForEvent(eventId);
+    } catch (e) {
+      setAdminStatus("Failed to load event participants: " + (e.message || e), "error");
+      return;
+    }
+  
+    // Keep only active participants NOT already added to this event
+    const eligible = allParticipants.filter(p => !existingIds.has(p.id));
+  
+    // Reset selection when switching events
+    selected = new Set();
+  
+    // Replace the list the renderer uses
+    window.__eligibleParticipants = eligible; // simple storage for render
+    renderParticipantsWithSource("", eligible);
+  
+    setAdminStatus(`Ready. Eligible participants: ${eligible.length}`, "success");
+  }
+  
+  // Initial filter based on currently selected event
+  await refreshCandidateListForSelectedEvent();
+  
+  // a helper that returns a Set of already-added participant_ids for an event
+  async function getExistingParticipantIdsForEvent(eventId) {
+    const { data, error } = await supabaseClient
+      .from("event_participants")
+      .select("participant_id")
+      .eq("event_id", eventId);
+  
+    if (error) throw error;
+  
+    return new Set((data || []).map(r => r.participant_id));
+  }
   // Load participants
   // IMPORTANT: your participants table column names must match these selects:
   // - id (uuid), full_name, participant_type, participant_affiliation
@@ -402,21 +468,24 @@ async function loadAdminAdd() {
   selected = new Set();
   renderParticipants("");
 
-  $("pSearch").addEventListener("input", (e) => renderParticipants(e.target.value));
+  $("pSearch").addEventListener("input", (e) => {
+    renderParticipantsWithSource(e.target.value, window.__eligibleParticipants || []);
+  });
 
   $("selectAllBtn").onclick = () => {
+    const eligible = window.__eligibleParticipants || [];
     const f = ($("pSearch")?.value || "").toLowerCase().trim();
-    const visible = allParticipants.filter(p => {
-      const name = (p.full_name || "").toLowerCase();
-      return !f || name.includes(f);
-    });
-    visible.forEach(p => selected.add(p.id));
-    renderParticipants($("pSearch")?.value || "");
+  
+    eligible
+      .filter(p => !f || (p.full_name || "").toLowerCase().includes(f))
+      .forEach(p => selected.add(p.id));
+  
+    renderParticipantsWithSource($("pSearch")?.value || "", eligible);
   };
 
   $("clearSelBtn").onclick = () => {
     selected = new Set();
-    renderParticipants($("pSearch")?.value || "");
+    renderParticipantsWithSource($("pSearch")?.value || "", window.__eligibleParticipants || []);
   };
 
   $("addBtn").onclick = async () => {
@@ -451,12 +520,18 @@ async function loadAdminAdd() {
     }
 
     setAdminStatus(`Added/updated ${rows.length} participants for this event.`, "success");
+    await refreshCandidateListForSelectedEvent();
   };
 
   setAdminStatus("Ready.", "success");
   show("adminCard", true);
 }
 
+// When event changes, refresh the eligible list
+$("eventSelect").addEventListener("change", async () => {
+  $("pSearch").value = "";
+  await refreshCandidateListForSelectedEvent();
+});
 
 
 
